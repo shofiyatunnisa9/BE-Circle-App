@@ -9,7 +9,6 @@ export async function registerController(
 ) {
   try {
     await registerSchema.validateAsync(req.body);
-
     const user = await registerService(req.body);
     res.status(201).json(user);
   } catch (error: any) {
@@ -27,6 +26,7 @@ export async function loginController(
     const token = await loginService(req.body);
     res.status(200).json({ message: "login succes", token });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    next(error);
+    // res.status(500).json({ error: error.message });
   }
 }
