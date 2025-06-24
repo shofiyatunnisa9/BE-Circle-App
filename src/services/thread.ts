@@ -20,3 +20,49 @@ export async function createThread(data: thread) {
     images: thread.images ? JSON.parse(thread.images) : [],
   };
 }
+
+export async function getThread() {
+  return await prisma.thread.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+        },
+      },
+    },
+  });
+}
+
+export async function getThreadById(id: string) {
+  return await prisma.thread.findUnique({
+    where: { id },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+        },
+      },
+    },
+  });
+}
+
+export async function deleteThread(id: string) {
+  return await prisma.thread.delete({
+    where: { id },
+  });
+}
+
+export async function updateThread(id: string, data: { content?: string; images?: string[] }) {
+  return await prisma.thread.update({
+    where: { id },
+    data: {
+      content: data.content,
+      images: data.images ? JSON.stringify(data.images) : undefined,
+    },
+  });
+}

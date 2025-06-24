@@ -7,16 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Roles {
+  USER
+}
+
 model User {
   id        String   @id @default(uuid())
   username  String
   email     String   @unique
   password  String
   image     String[]
-  thread    Thread[]
   createdAt DateTime @default(now())
+  thread    Thread[]
   following Follow[] @relation("Following")
   follower  Follow[] @relation("Follower")
+  role      Roles    @default(USER)
 }
 
 model Thread {
@@ -24,7 +29,7 @@ model Thread {
   content   String
   images    String?
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String   @unique
+  userId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

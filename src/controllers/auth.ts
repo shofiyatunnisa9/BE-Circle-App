@@ -27,6 +27,5 @@ export async function loginController(
     res.status(200).json({ message: "login succes", token });
   } catch (error: any) {
     next(error);
-    // res.status(500).json({ error: error.message });
   }
 }
