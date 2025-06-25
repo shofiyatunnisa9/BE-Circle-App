@@ -22,6 +22,8 @@ model User {
   following Follow[] @relation("Following")
   follower  Follow[] @relation("Follower")
   role      Roles    @default(USER)
+  Like      Like[]
+  Reply     Reply[]
 }
 
 model Thread {
@@ -32,6 +34,8 @@ model Thread {
   userId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  likes     Like[]
+  replies   Reply[]  @relation("ThreadReplies")
 }
 
 model Follow {
@@ -40,4 +44,23 @@ model Follow {
   followerId  String
   following   User   @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
   follower    User   @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  thread    Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  threadId  String
+  createdAt DateTime @default(now())
+}
+
+model Reply {
+  id        String   @id @default(uuid())
+  content   String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  thread    Thread   @relation("ThreadReplies", fields: [threadId], references: [id], onDelete: Cascade)
+  threadId  String
+  createdAt DateTime @default(now())
 }

@@ -4,6 +4,7 @@ import express from "express";
 import authRouter from "./src/routes/auth";
 import threadRouter from "./src/routes/thread";
 import corsMiddleware from "./src/configs/cors";
+import path from "path";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -12,6 +13,8 @@ app.use(corsMiddleware);
 app.use("/api", authRouter);
 app.use("/api", threadRouter);
 
+const uploadPath = path.join(__dirname, "src", "uploads");
+app.use("/uploads", express.static(uploadPath));
 app.listen(PORT, () => {
   console.log(`server is running ${PORT}`);
 });

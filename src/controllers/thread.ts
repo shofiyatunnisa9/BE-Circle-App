@@ -1,10 +1,18 @@
 import { Request, Response } from "express";
 import { threadSchema } from "../validations/thread";
-import { createThread, getThread, getThreadById, deleteThread, updateThread } from "../services/thread";
+import {
+  createThread,
+  getThread,
+  getThreadById,
+  deleteThread,
+  updateThread,
+} from "../services/thread";
 
 export async function threadController(req: Request, res: Response) {
   try {
     const userId = (req as any).user?.id;
+    const { content } = req.body;
+
     if (!userId) {
       res.status(401).json({ error: "Unouthorized" });
       return;
@@ -16,12 +24,14 @@ export async function threadController(req: Request, res: Response) {
       });
       return;
     }
+    const files = req.file;
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
 
-    const { content, images } = req.body;
+    const imageUrls = `${baseUrl}/uploads/${files?.filename}`;
     const newThread = await createThread({
       userId,
       content,
-      images,
+      images: imageUrls,
     });
 
     res.status(201).json({ message: "Thread succes uploaded", newThread });
@@ -34,7 +44,14 @@ export async function threadAllController(reg: Request, res: Response) {
   try {
     const threads = await getThread();
 
-    res.status(200).json({ message: "All Thread fetched", threads });
+    const payload = threads.map((thread) => ({
+      content: thread.content,
+      images: thread.images,
+      createdAt: thread.createdAt,
+      username: thread.user.username,
+      image: thread.user.image,
+    }));
+    res.status(200).json({ message: "All Thread fetched", payload });
   } catch (error) {
     res.status(400).json({ message: "Failed get datas" });
   }

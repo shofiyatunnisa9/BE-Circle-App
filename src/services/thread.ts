@@ -3,7 +3,7 @@ import { prisma } from "../configs/prismaClient";
 interface thread {
   userId: string;
   content: string;
-  images?: string[];
+  images?: string;
 }
 
 export async function createThread(data: thread) {
@@ -11,13 +11,13 @@ export async function createThread(data: thread) {
     data: {
       userId: data.userId,
       content: data.content,
-      images: data.images ? JSON.stringify(data.images) : null,
+      images: data.images ?? null,
     },
   });
 
   return {
     content: thread.content,
-    images: thread.images ? JSON.parse(thread.images) : [],
+    images: thread.images,
   };
 }
 
@@ -31,6 +31,7 @@ export async function getThread() {
         select: {
           id: true,
           username: true,
+          image: true,
         },
       },
     },
@@ -57,7 +58,10 @@ export async function deleteThread(id: string) {
   });
 }
 
-export async function updateThread(id: string, data: { content?: string; images?: string[] }) {
+export async function updateThread(
+  id: string,
+  data: { content?: string; images?: string[] }
+) {
   return await prisma.thread.update({
     where: { id },
     data: {
