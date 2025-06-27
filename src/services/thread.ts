@@ -3,7 +3,7 @@ import { prisma } from "../configs/prismaClient";
 interface thread {
   userId: string;
   content: string;
-  images?: string;
+  images?: string | null;
 }
 
 export async function createThread(data: thread) {
@@ -31,7 +31,12 @@ export async function getThread() {
         select: {
           id: true,
           username: true,
-          image: true,
+          profile: {
+            select: {
+              fullname: true,
+              avatar: true,
+            },
+          },
         },
       },
     },

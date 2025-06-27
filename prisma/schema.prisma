@@ -12,55 +12,102 @@ enum Roles {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  username  String
+  id String @id @default(uuid())
+
+  username  String   @unique
   email     String   @unique
   password  String
-  image     String[]
   createdAt DateTime @default(now())
+
+  profile   Profile?
   thread    Thread[]
   following Follow[] @relation("Following")
   follower  Follow[] @relation("Follower")
   role      Roles    @default(USER)
   Like      Like[]
-  Reply     Reply[]
+  reply     Reply[]
+
+  @@map("users")
+}
+
+model Profile {
+  id String @id @default(uuid())
+
+  fullname String
+  bio      String?
+  avatar   String?
+  banner   String?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("profiles")
 }
 
 model Thread {
-  id        String   @id @default(uuid())
-  content   String
-  images    String?
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id      String  @id @default(uuid())
+  content String
+  images  String?
+
+  likes   Like[]
+  replies Reply[] @relation("ThreadReplies")
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   userId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  likes     Like[]
-  replies   Reply[]  @relation("ThreadReplies")
+
+  @@map("threads")
 }
 
 model Follow {
-  id          String @id @default(uuid())
+  id String @id @default(uuid())
+
   followingId String
   followerId  String
-  following   User   @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
-  follower    User   @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+
+  following User @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+  follower  User @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([followingId, followerId])
+  @@map("follows")
 }
 
 model Like {
-  id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id String @id @default(uuid())
+
   userId    String
-  thread    Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
   threadId  String
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  thread Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, threadId])
+  @@map("likes")
 }
 
 model Reply {
-  id        String   @id @default(uuid())
-  content   String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  thread    Thread   @relation("ThreadReplies", fields: [threadId], references: [id], onDelete: Cascade)
-  threadId  String
+  id String @id @default(uuid())
+
+  content  String
+  images   String?
+  userId   String
+  threadId String
+
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  thread Thread @relation("ThreadReplies", fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, threadId])
+  @@map("replies")
 }
