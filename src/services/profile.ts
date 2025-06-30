@@ -1,4 +1,50 @@
 import { prisma } from "../configs/prismaClient";
+interface Profile {
+  userId: string;
+  fullname: string;
+  username: string;
+  avatar: string;
+  banner?: string;
+  bio?: string;
+}
+
+export async function editProfile(data: Profile) {
+  const { userId, fullname, username, avatar, banner, bio } = data;
+  await prisma.user.update({
+    where: { id: userId },
+    data: { username },
+  });
+  const updateProfile = await prisma.profile.update({
+    where: { userId },
+    data: {
+      fullname,
+      avatar,
+      banner,
+      bio,
+    },
+    select: {
+      fullname: true,
+      avatar: true,
+      banner: true,
+      bio: true,
+      user: {
+        select: {
+          username: true,
+        },
+      },
+    },
+  });
+  return {
+    username: updateProfile.user.username,
+
+    profile: {
+      fullname: updateProfile.fullname,
+      avatar: updateProfile.avatar,
+      banner: updateProfile.banner,
+      bio: updateProfile.bio,
+    },
+  };
+}
 
 export async function getProfile(id: string) {
   const user = await prisma.user.findUnique({
@@ -7,14 +53,20 @@ export async function getProfile(id: string) {
       username: true,
       profile: {
         select: {
-          bio: true,
           fullname: true,
           avatar: true,
           banner: true,
+          bio: true,
         },
       },
     },
   });
-
-  return user;
+  if (!user) return null;
+  return {
+    username: user.username,
+    fullname: user.profile?.fullname,
+    avatar: user.profile?.avatar,
+    banner: user.profile?.banner,
+    bio: user.profile?.bio,
+  };
 }
