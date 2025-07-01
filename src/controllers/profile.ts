@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { editProfile, getProfile } from "../services/profile";
+import { editProfile, getProfile, getUserThread } from "../services/profile";
 import { profileSchema } from "../validations/profile";
 
 export async function getProfileController(
@@ -68,5 +68,16 @@ export async function editProfileController(req: Request, res: Response) {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed update profile :(" });
+  }
+}
+export async function getUserThreadController(req: Request, res: Response) {
+  try {
+    const userId = (req as any).user.id;
+
+    const threadProfiles = await getUserThread(userId);
+
+    res.json({ payload: threadProfiles });
+  } catch (error) {
+    res.status(500).json({ message: "Failed fetch datas" });
   }
 }

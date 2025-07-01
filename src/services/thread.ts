@@ -51,6 +51,13 @@ export async function getThreadById(id: string) {
         select: {
           id: true,
           username: true,
+          profile: {
+            select: {
+              fullname: true,
+              avatar: true,
+              createdAt: true,
+            },
+          },
         },
       },
     },

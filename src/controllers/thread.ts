@@ -45,38 +45,6 @@ export async function threadController(req: Request, res: Response) {
   }
 }
 
-// export async function threadController(req: Request, res: Response) {
-//   try {
-//     const userId = (req as any).user?.id;
-//     const { content } = req.body;
-
-//     if (!userId) {
-//       res.status(401).json({ error: "Unouthorized" });
-//       return;
-//     }
-//     const threads = threadSchema.validate(req.body);
-//     if (!threads) {
-//       res.status(400).json({
-//         error: "Invalid input",
-//       });
-//       return;
-//     }
-//     const files = req.file;
-//     const baseUrl = `${req.protocol}://${req.get("host")}`;
-
-//     const imageUrls = `${baseUrl}/uploads/${files?.filename}`;
-//     const newThread = await createThread({
-//       userId,
-//       content,
-//       images: imageUrls,
-//     });
-
-//     res.status(201).json({ message: "Thread succes uploaded", newThread });
-//   } catch (error) {
-//     res.status(500).json({ error: "Failed post Thread" });
-//   }
-// }
-
 export async function threadAllController(reg: Request, res: Response) {
   try {
     const threads = await getThread();

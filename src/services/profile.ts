@@ -70,3 +70,25 @@ export async function getProfile(id: string) {
     bio: user.profile?.bio,
   };
 }
+export async function getUserThread(userId: string) {
+  return await prisma.thread.findMany({
+    where: { userId },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+          profile: {
+            select: {
+              fullname: true,
+              avatar: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}

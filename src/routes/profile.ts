@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   editProfileController,
   getProfileController,
+  getUserThreadController,
 } from "../controllers/profile";
 import { authenticate } from "../middleware/auth";
 import { uploadProfileImage } from "../utils/multer";
@@ -15,5 +16,6 @@ route.patch(
   uploadProfileImage,
   editProfileController
 );
+route.get("/profile-home", authenticate, getUserThreadController);
 
 export default route;
