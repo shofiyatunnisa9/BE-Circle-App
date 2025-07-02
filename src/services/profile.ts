@@ -92,3 +92,25 @@ export async function getUserThread(userId: string) {
     },
   });
 }
+
+export async function getMedia(userId: string) {
+  return await prisma.thread.findMany({
+    where: {
+      userId,
+      images: {
+        not: null,
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+        },
+      },
+    },
+  });
+}

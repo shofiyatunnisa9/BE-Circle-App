@@ -5,6 +5,7 @@ import authRouter from "./src/routes/auth";
 import threadRouter from "./src/routes/thread";
 import profileRouter from "./src/routes/profile";
 import searchRouter from "./src/routes/search";
+import suggestRouter from "./src/routes/suggest";
 import corsMiddleware from "./src/configs/cors";
 import path from "path";
 
@@ -16,6 +17,7 @@ app.use("/api", authRouter);
 app.use("/api", threadRouter);
 app.use("/api", profileRouter);
 app.use("/api", searchRouter);
+app.use("/api", suggestRouter);
 const uploadPath = path.join(__dirname, "src", "uploads");
 app.use("/uploads", express.static(uploadPath));
 app.listen(PORT, () => {

@@ -1,5 +1,10 @@
 import { Request, Response } from "express";
-import { editProfile, getProfile, getUserThread } from "../services/profile";
+import {
+  editProfile,
+  getMedia,
+  getProfile,
+  getUserThread,
+} from "../services/profile";
 import { profileSchema } from "../validations/profile";
 
 export async function getProfileController(
@@ -79,5 +84,19 @@ export async function getUserThreadController(req: Request, res: Response) {
     res.json({ payload: threadProfiles });
   } catch (error) {
     res.status(500).json({ message: "Failed fetch datas" });
+  }
+}
+
+export async function getMediaController(req: Request, res: Response) {
+  try {
+    const userId = (req as any).user.id;
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+    const mediaProfile = await getMedia(userId);
+    res.status(200).json({ message: "Succes", mediaProfile });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to get Media" });
   }
 }

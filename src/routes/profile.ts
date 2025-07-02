@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   editProfileController,
+  getMediaController,
   getProfileController,
   getUserThreadController,
 } from "../controllers/profile";
@@ -17,5 +18,6 @@ route.patch(
   editProfileController
 );
 route.get("/profile-home", authenticate, getUserThreadController);
+route.get("/media", authenticate, getMediaController);
 
 export default route;
