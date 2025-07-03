@@ -46,16 +46,19 @@ export async function getThread() {
 export async function getThreadById(id: string) {
   return await prisma.thread.findUnique({
     where: { id },
-    include: {
+
+    select: {
+      id: true,
+      content: true,
+      createdAt: true,
+      images: true,
       user: {
         select: {
-          id: true,
           username: true,
           profile: {
             select: {
-              fullname: true,
               avatar: true,
-              createdAt: true,
+              fullname: true,
             },
           },
         },

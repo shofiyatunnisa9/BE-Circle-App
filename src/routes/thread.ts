@@ -12,7 +12,7 @@ const router = Router();
 
 router.post("/post", authenticate, upload.single("images"), threadController);
 router.get("/threads", threadAllController);
-router.get("/threads/:id", authenticate, threadByIdController);
+router.get("/threads/:id", threadByIdController);
 router.delete("/threads/:id", deleteThreadController);
 
 export default router;

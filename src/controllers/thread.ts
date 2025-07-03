@@ -50,6 +50,7 @@ export async function threadAllController(reg: Request, res: Response) {
     const threads = await getThread();
 
     const payload = threads.map((thread) => ({
+      id: thread.id,
       content: thread.content,
       images: thread.images,
       createdAt: thread.createdAt,
