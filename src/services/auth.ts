@@ -65,7 +65,7 @@ export async function forgotService(data: string) {
 
   const payload: TokenPayload = { id: user.id };
   const token = signToken(payload);
-  const linkReset = `http://localhost:3000/api/reset/${token}`;
+  const linkReset = `http://localhost:5173/reset/${token}`;
 
   await sentReset(data, linkReset);
   return token;
