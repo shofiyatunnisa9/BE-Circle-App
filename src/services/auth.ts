@@ -1,6 +1,8 @@
 import { prisma } from "../configs/prismaClient";
 import { compare, hash } from "bcrypt";
 import { signToken, TokenPayload } from "../utils/jwt";
+import { sentReset } from "../utils/mailer";
+import { link } from "joi";
 
 interface auth {
   username: string;
@@ -52,4 +54,29 @@ export async function loginService(data: auth) {
   const payload: TokenPayload = { id: user.id };
   const token = signToken(payload);
   return token;
+}
+
+export async function forgotService(data: string) {
+  const user = await prisma.user.findUnique({
+    where: { email: data },
+  });
+
+  if (!user) throw new Error("Email is not registered");
+
+  const payload: TokenPayload = { id: user.id };
+  const token = signToken(payload);
+  const linkReset = `http://localhost:3000/api/reset/${token}`;
+
+  await sentReset(data, linkReset);
+  return token;
+}
+
+export async function resetService(id: string, password: string) {
+  const hashPassword = await hash(password, 10);
+  await prisma.user.update({
+    where: { id },
+    data: {
+      password: hashPassword,
+    },
+  });
 }

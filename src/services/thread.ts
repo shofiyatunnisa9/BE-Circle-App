@@ -39,6 +39,8 @@ export async function getThread() {
           },
         },
       },
+      likes: true,
+      replies: true,
     },
   });
 }
