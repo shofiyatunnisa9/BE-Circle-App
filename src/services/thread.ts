@@ -21,8 +21,8 @@ export async function createThread(data: thread) {
   };
 }
 
-export async function getThread() {
-  return await prisma.thread.findMany({
+export async function getThread(currentUserId?: string) {
+  const threads = await prisma.thread.findMany({
     orderBy: {
       createdAt: "desc",
     },
@@ -39,23 +39,46 @@ export async function getThread() {
           },
         },
       },
-      likes: true,
-      replies: true,
+      // Get all likes for this thread
+      likes: {
+        select: {
+          userId: true,
+        },
+      },
+      // Get count of replies
+      _count: {
+        select: {
+          replies: true,
+        },
+      },
     },
+  });
+
+  // Process each thread to add like info
+  return threads.map((thread) => {
+    // Check if current user has liked this thread
+    const userLiked = thread.likes.some(
+      (like) => like.userId === currentUserId
+    );
+
+    return {
+      ...thread,
+      isLiked: userLiked,
+      likeCount: thread.likes.length,
+      replyCount: thread._count.replies,
+      likes: undefined, // Remove likes array since we only need count and status
+      _count: undefined, // Remove _count object
+    };
   });
 }
 
-export async function getThreadById(id: string) {
-  return await prisma.thread.findUnique({
+export async function getThreadById(id: string, currentUserId?: string) {
+  const thread = await prisma.thread.findUnique({
     where: { id },
-
-    select: {
-      id: true,
-      content: true,
-      createdAt: true,
-      images: true,
+    include: {
       user: {
         select: {
+          id: true,
           username: true,
           profile: {
             select: {
@@ -65,8 +88,34 @@ export async function getThreadById(id: string) {
           },
         },
       },
+      // Get all likes for this thread
+      likes: {
+        select: {
+          userId: true,
+        },
+      },
+      // Get count of replies
+      _count: {
+        select: {
+          replies: true,
+        },
+      },
     },
   });
+
+  if (!thread) return null;
+
+  // Check if current user has liked this thread
+  const userLiked = thread.likes.some((like) => like.userId === currentUserId);
+
+  return {
+    ...thread,
+    isLiked: userLiked,
+    likeCount: thread.likes.length,
+    replyCount: thread._count.replies,
+    likes: undefined,
+    _count: undefined,
+  };
 }
 
 export async function deleteThread(id: string) {

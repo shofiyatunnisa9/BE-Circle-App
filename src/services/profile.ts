@@ -71,7 +71,7 @@ export async function getProfile(id: string) {
   };
 }
 export async function getUserThread(userId: string) {
-  return await prisma.thread.findMany({
+  const threads = await prisma.thread.findMany({
     where: { userId },
     orderBy: {
       createdAt: "desc",
@@ -89,7 +89,30 @@ export async function getUserThread(userId: string) {
           },
         },
       },
+      likes: {
+        select: {
+          userId: true,
+        },
+      },
+      _count: {
+        select: {
+          replies: true,
+        },
+      },
     },
+  });
+
+  return threads.map((thread) => {
+    const userLiked = thread.likes.some((like) => like.userId === userId);
+
+    return {
+      ...thread,
+      isLiked: userLiked,
+      likeCount: thread.likes.length,
+      replyCount: thread._count.replies,
+      likes: undefined,
+      _count: undefined,
+    };
   });
 }
 

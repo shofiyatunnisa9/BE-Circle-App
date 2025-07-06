@@ -1,7 +1,8 @@
 import { prisma } from "../configs/prismaClient";
 
 export async function likeThreads(userId: string, threadId: string) {
-  const exitingLike = await prisma.like.findUnique({
+  // Cek apakah user sudah like thread ini
+  const existingLike = await prisma.like.findUnique({
     where: {
       userId_threadId: {
         userId,
@@ -10,7 +11,8 @@ export async function likeThreads(userId: string, threadId: string) {
     },
   });
 
-  if (exitingLike) {
+  // Jika sudah like, hapus like (unlike)
+  if (existingLike) {
     await prisma.like.delete({
       where: {
         userId_threadId: {
@@ -19,14 +21,16 @@ export async function likeThreads(userId: string, threadId: string) {
         },
       },
     });
-    return { liked: false };
-  } else {
+    return { liked: false, message: "Thread di-unlike" };
+  }
+  // Jika belum like, tambah like
+  else {
     await prisma.like.create({
       data: {
         userId,
         threadId,
       },
     });
-    return { liked: true };
+    return { liked: true, message: "Thread di-like" };
   }
 }

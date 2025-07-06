@@ -7,6 +7,7 @@ import {
   deleteThread,
   updateThread,
 } from "../services/thread";
+
 export async function threadController(req: Request, res: Response) {
   try {
     const userId = (req as any).user?.id;
@@ -45,10 +46,10 @@ export async function threadController(req: Request, res: Response) {
   }
 }
 
-export async function threadAllController(reg: Request, res: Response) {
+export async function threadAllController(req: Request, res: Response) {
   try {
-    const threads = await getThread();
-
+    const currentUserId = (req as any).user?.id;
+    const threads = await getThread(currentUserId);
     const payload = threads.map((thread) => ({
       id: thread.id,
       content: thread.content,
@@ -57,9 +58,13 @@ export async function threadAllController(reg: Request, res: Response) {
       username: thread.user.username,
       fullname: thread.user.profile?.fullname,
       avatar: thread.user.profile?.avatar,
+      isLiked: thread.isLiked,
+      likeCount: thread.likeCount,
+      replyCount: thread.replyCount,
     }));
     res.status(200).json({ message: "All Thread fetched", payload });
   } catch (error) {
+    console.error("Thread controller error:", error);
     res.status(400).json({ message: "Failed get datas" });
   }
 }
@@ -67,7 +72,8 @@ export async function threadAllController(reg: Request, res: Response) {
 export async function threadByIdController(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const thread = await getThreadById(id);
+    const currentUserId = (req as any).user?.id;
+    const thread = await getThreadById(id, currentUserId);
     if (!thread) {
       res.status(404).json({ message: "Thread not found" });
       return;
