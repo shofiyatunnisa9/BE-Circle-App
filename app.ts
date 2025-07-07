@@ -8,6 +8,7 @@ import searchRouter from "./src/routes/search";
 import suggestRouter from "./src/routes/suggest";
 import likeRouter from "./src/routes/like";
 import repliesRouter from "./src/routes/reply";
+import followRouter from "./src/routes/follow";
 import corsMiddleware from "./src/configs/cors";
 import path from "path";
 
@@ -22,6 +23,7 @@ app.use("/api", searchRouter);
 app.use("/api", suggestRouter);
 app.use("/api", likeRouter);
 app.use("/api", repliesRouter);
+app.use("/api", followRouter);
 const uploadPath = path.join(__dirname, "src", "uploads");
 app.use("/uploads", express.static(uploadPath));
 app.listen(PORT, () => {

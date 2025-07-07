@@ -70,6 +70,43 @@ export async function getProfile(id: string) {
     bio: user.profile?.bio,
   };
 }
+
+export async function getProfileWithFollowCounts(userId: string) {
+  const [user, followingCount, followersCount] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        username: true,
+        profile: {
+          select: {
+            fullname: true,
+            avatar: true,
+            banner: true,
+            bio: true,
+          },
+        },
+      },
+    }),
+    prisma.follow.count({
+      where: { followerId: userId },
+    }),
+    prisma.follow.count({
+      where: { followingId: userId },
+    }),
+  ]);
+
+  if (!user) return null;
+
+  return {
+    username: user.username,
+    fullname: user.profile?.fullname,
+    avatar: user.profile?.avatar,
+    banner: user.profile?.banner,
+    bio: user.profile?.bio,
+    followingCount,
+    followersCount,
+  };
+}
 export async function getUserThread(userId: string) {
   const threads = await prisma.thread.findMany({
     where: { userId },

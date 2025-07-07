@@ -62,6 +62,7 @@ export async function threadAllController(req: Request, res: Response) {
       likeCount: thread.likeCount,
       replyCount: thread.replyCount,
     }));
+
     res.status(200).json({ message: "All Thread fetched", payload });
   } catch (error) {
     console.error("Thread controller error:", error);

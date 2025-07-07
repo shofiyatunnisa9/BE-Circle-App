@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import {
   editProfile,
   getMedia,
-  getProfile,
+  getProfileWithFollowCounts,
   getUserThread,
 } from "../services/profile";
 import { profileSchema } from "../validations/profile";
@@ -13,7 +13,7 @@ export async function getProfileController(
 ): Promise<void> {
   try {
     const userId = (req as any).user.id;
-    const user = await getProfile(userId);
+    const user = await getProfileWithFollowCounts(userId);
 
     if (!user) {
       res.status(404).json({ message: "User not found" });
