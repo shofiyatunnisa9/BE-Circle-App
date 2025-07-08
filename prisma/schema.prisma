@@ -108,6 +108,5 @@ model Reply {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   thread Thread @relation("ThreadReplies", fields: [threadId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, threadId])
   @@map("replies")
 }

@@ -174,3 +174,100 @@ export async function getMedia(userId: string) {
     },
   });
 }
+
+export async function getProfileByUsername(username: string) {
+  const user = await prisma.user.findUnique({
+    where: { username },
+    select: {
+      id: true,
+      username: true,
+      profile: {
+        select: {
+          fullname: true,
+          avatar: true,
+          banner: true,
+          bio: true,
+        },
+      },
+    },
+  });
+
+  if (!user) return null;
+
+  const [followingCount, followersCount] = await Promise.all([
+    prisma.follow.count({
+      where: { followerId: user.id },
+    }),
+    prisma.follow.count({
+      where: { followingId: user.id },
+    }),
+  ]);
+
+  return {
+    id: user.id,
+    username: user.username,
+    fullname: user.profile?.fullname,
+    avatar: user.profile?.avatar,
+    banner: user.profile?.banner,
+    bio: user.profile?.bio,
+    followingCount,
+    followersCount,
+  };
+}
+
+export async function getUserThreadByUsername(
+  username: string,
+  currentUserId: string
+) {
+  const user = await prisma.user.findUnique({
+    where: { username },
+  });
+
+  if (!user) return null;
+
+  const threads = await prisma.thread.findMany({
+    where: { userId: user.id },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+          profile: {
+            select: {
+              fullname: true,
+              avatar: true,
+            },
+          },
+        },
+      },
+      likes: {
+        select: {
+          userId: true,
+        },
+      },
+      _count: {
+        select: {
+          replies: true,
+        },
+      },
+    },
+  });
+
+  return threads.map((thread) => {
+    const userLiked = thread.likes.some(
+      (like) => like.userId === currentUserId
+    );
+
+    return {
+      ...thread,
+      isLiked: userLiked,
+      likeCount: thread.likes.length,
+      replyCount: thread._count.replies,
+      likes: undefined,
+      _count: undefined,
+    };
+  });
+}

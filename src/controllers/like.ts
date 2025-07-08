@@ -9,13 +9,13 @@ export async function likeController(req: Request, res: Response) {
 
     // Validasi input
     if (!threadId) {
-      return res.status(400).json({ message: "Thread ID wajib diisi" });
+      res.status(400).json({ message: "Thread ID wajib diisi" });
+      return;
     }
 
     // Proses like/unlike
     const result = await likeThreads(userId, threadId);
 
-    // Kirim response
     res.status(200).json({
       success: true,
       message: result.message,

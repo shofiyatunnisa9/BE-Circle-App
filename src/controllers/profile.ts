@@ -2,8 +2,10 @@ import { Request, Response } from "express";
 import {
   editProfile,
   getMedia,
+  getProfileByUsername,
   getProfileWithFollowCounts,
   getUserThread,
+  getUserThreadByUsername,
 } from "../services/profile";
 import { profileSchema } from "../validations/profile";
 
@@ -98,5 +100,46 @@ export async function getMediaController(req: Request, res: Response) {
     res.status(200).json({ message: "Succes", mediaProfile });
   } catch (error) {
     res.status(500).json({ message: "Failed to get Media" });
+  }
+}
+
+export async function profileUsersController(req: Request, res: Response) {
+  try {
+    const { username } = req.params;
+    const { currentUserId } = (req as any).user.id;
+    const profileUser = await getProfileByUsername(username);
+
+    if (!profileUser) {
+      res.status(404).json({ message: "User not found!!" });
+      return;
+    }
+
+    res.status(200).json({ code: "200", message: "Succes", profileUser });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ code: "500", message: "Error get Profile by username" });
+  }
+}
+
+export async function getThreadProfileByUsernameController(
+  req: Request,
+  res: Response
+) {
+  try {
+    const { username } = req.params;
+    const { currentUserId } = (req as any).user.id;
+    const threadProfile = await getUserThreadByUsername(
+      username,
+      currentUserId
+    );
+    if (!threadProfile === null) {
+      res.status(404).json({ code: "404", message: "User not Found!" });
+    }
+    res
+      .status(200)
+      .json({ code: "200", message: "Succes", payload: threadProfile });
+  } catch (error) {
+    res.status(400).json({ code: "400", message: "Failed fetch datas!" });
   }
 }
