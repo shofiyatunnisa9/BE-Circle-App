@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   editProfileController,
+  getMediaByUsernameController,
   getMediaController,
   getProfileController,
   getThreadProfileByUsernameController,
@@ -8,7 +9,7 @@ import {
   profileUsersController,
 } from "../controllers/profile";
 import { authenticate } from "../middleware/auth";
-import { uploadProfileImage } from "../utils/multer";
+import { upload } from "../middleware/multer";
 
 const route = Router();
 
@@ -16,7 +17,7 @@ route.get("/profile", authenticate, getProfileController);
 route.patch(
   "/profiles",
   authenticate,
-  uploadProfileImage,
+  upload.fields([{ name: "avatar" }, { name: "banner" }]),
   editProfileController
 );
 route.get("/profile-home", authenticate, getUserThreadController);
@@ -27,5 +28,10 @@ route.get(
   getThreadProfileByUsernameController
 );
 route.get("/media", authenticate, getMediaController);
+route.get(
+  "/profile/:username/media",
+  authenticate,
+  getMediaByUsernameController
+);
 
 export default route;

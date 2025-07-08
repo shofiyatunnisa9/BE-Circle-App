@@ -7,6 +7,8 @@ import {
   deleteThread,
   updateThread,
 } from "../services/thread";
+import { uploadToCloudinary } from "../utils/multer";
+import { CloudinaryUploadResultType } from "../types";
 
 export async function threadController(req: Request, res: Response) {
   try {
@@ -28,11 +30,19 @@ export async function threadController(req: Request, res: Response) {
     }
 
     // Cek file
-    let imageUrls = null;
-    if (req.file) {
-      const baseUrl = `${req.protocol}://${req.get("host")}`;
-      imageUrls = `${baseUrl}/uploads/${req.file.filename}`;
+    let imageUrls: string | null = null;
+    if (!req.file) {
+      res.status(400).json({ message: "No file uploaded" });
+      return;
     }
+
+    const result: CloudinaryUploadResultType = (await uploadToCloudinary(
+      req.file.buffer,
+      "circle-app"
+    )) as CloudinaryUploadResultType;
+    imageUrls = result.secure_url;
+
+    console.log(imageUrls);
 
     const newThread = await createThread({
       userId,

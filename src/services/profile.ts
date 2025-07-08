@@ -3,8 +3,8 @@ interface Profile {
   userId: string;
   fullname: string;
   username: string;
-  avatar: string;
-  banner?: string;
+  avatar?: string | null;
+  banner?: string | null;
   bio?: string;
 }
 
@@ -269,5 +269,29 @@ export async function getUserThreadByUsername(
       likes: undefined,
       _count: undefined,
     };
+  });
+}
+
+export async function getMediaByUsername(username: string) {
+  const user = await prisma.user.findUnique({ where: { username } });
+  if (!user) return null;
+  return await prisma.thread.findMany({
+    where: {
+      userId: user.id,
+      images: {
+        not: null,
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          username: true,
+        },
+      },
+    },
   });
 }

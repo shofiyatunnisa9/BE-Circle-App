@@ -6,7 +6,7 @@ import {
   threadController,
 } from "../controllers/thread";
 import { authenticate } from "../middleware/auth";
-import { upload } from "../utils/multer";
+import { upload } from "../middleware/multer";
 
 const router = Router();
 

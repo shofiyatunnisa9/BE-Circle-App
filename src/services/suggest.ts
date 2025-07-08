@@ -27,7 +27,7 @@ export async function suggestFollow(userId: string) {
     orderBy: {
       createdAt: "desc",
     },
-    take: 5,
+    take: 4,
   });
   return suggestedUsers;
 }
