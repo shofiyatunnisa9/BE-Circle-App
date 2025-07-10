@@ -16,6 +16,11 @@ const app = express();
 const PORT = process.env.PORT;
 app.use(express.json());
 app.use(corsMiddleware);
+
+app.get("/", (req, res) => {
+  res.send("Baclend Ready!!");
+});
+
 app.use("/api", authRouter);
 app.use("/api", threadRouter);
 app.use("/api", profileRouter);
