@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { createReply, getReply } from "../services/reply";
+import { CloudinaryUploadResultType } from "../types";
+import { uploadToCloudinary } from "../utils/multer";
 
 export async function repliesController(req: Request, res: Response) {
   try {
@@ -17,12 +19,18 @@ export async function repliesController(req: Request, res: Response) {
       return;
     }
 
-
-    let imageUrl: string | undefined;
-    if (req.file) {
-      const baseUrl = `${req.protocol}://${req.get("host")}`;
-      imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
+    let imageUrl: string | null = null;
+    if (!req.file) {
+      res.status(400).json({ message: "No file uploaded" });
+      return;
     }
+
+    const result: CloudinaryUploadResultType = (await uploadToCloudinary(
+      req.file.buffer,
+      "circle-app/reply"
+    )) as CloudinaryUploadResultType;
+    imageUrl = result.secure_url;
+
     const newReplies = await createReply({
       userId,
       threadId,
