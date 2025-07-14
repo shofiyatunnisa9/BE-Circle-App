@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(corsMiddleware);
 
 app.get("/", (req, res) => {
-  res.send("Baclend Ready!!");
+  res.send("Backend Ready!!");
 });
 
 app.use("/api", authRouter);
